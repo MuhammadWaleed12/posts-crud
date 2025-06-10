@@ -4,7 +4,12 @@ import { Inter } from 'next/font/google';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { Toaster } from '@/components/ui/sonner';
 
-const inter = Inter({ subsets: ['latin'] });
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap', // Ensure consistent font loading
+  variable: '--font-inter', // Optional: use CSS variables
+});
 
 export const metadata: Metadata = {
   title: 'Dashboard App',
