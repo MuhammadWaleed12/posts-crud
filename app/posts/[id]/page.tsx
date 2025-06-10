@@ -3,18 +3,21 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { PostDetailClient } from './post-detail-client';
 
-// This must be in the server component (no 'use client')
+interface Props {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
 export async function generateStaticParams() {
   try {
     const response = await fetch('https://jsonplaceholder.typicode.com/posts');
     const posts = await response.json();
     
-    return posts.map((post: any) => ({
+    return posts.map((post: { id: number }) => ({
       id: post.id.toString(),
     }));
   } catch (error) {
     console.error('Failed to fetch posts for static generation:', error);
-    // Fallback: generate first 100 post IDs if API fails
     return Array.from({ length: 100 }, (_, i) => ({
       id: (i + 1).toString(),
     }));
@@ -39,11 +42,13 @@ function PostSkeleton() {
   );
 }
 
-export default function PostPage({ params }: { params: { id: string } }) {
+export default async function PostPage({ params }: Props) {
+  // Await the params promise
+  const { id } = await params;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header with back button */}
         <div className="mb-8">
           <Link 
             href="/"
@@ -55,7 +60,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
         </div>
         
         <Suspense fallback={<PostSkeleton />}>
-          <PostDetailClient id={parseInt(params.id)} />
+          <PostDetailClient id={parseInt(id)} />
         </Suspense>
       </div>
     </div>
